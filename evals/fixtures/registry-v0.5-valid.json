@@ -1,0 +1,151 @@
+{
+  "schema_version": "0.5",
+  "campaign": {
+    "id": "demo-campaign",
+    "title": "Синтетический пример для проверки формата",
+    "jurisdiction": "Учебная территория",
+    "goal": "Проверить состояние учебного объекта",
+    "bottleneck": "",
+    "change_hypothesis": "",
+    "weekly_hours": 2,
+    "last_verified_on": null
+  },
+  "cases": [
+    {
+      "id": "demo-case",
+      "title": "Учебный объект",
+      "location_or_scope": "Условное место",
+      "requested_change": "Установить состояние",
+      "status": "active",
+      "topic": "Учебная тема",
+      "applicant_type": "collective",
+      "applicant_actor_ids": [
+        "demo-actor"
+      ],
+      "last_verified_on": null
+    }
+  ],
+  "actors": [
+    {
+      "id": "demo-actor",
+      "label": "Условная инициативная группа",
+      "roles": [
+        "organizer",
+        "applicant"
+      ],
+      "position": "supportive",
+      "source_ids": [],
+      "constraints": "Учебный пример"
+    }
+  ],
+  "sources": [
+    {
+      "id": "demo-source",
+      "source_type": "official_document",
+      "title": "Синтетическое уведомление о регистрации",
+      "locator": "Учебный текст, не настоящий документ",
+      "dated_on": "2026-11-01",
+      "availability": "reviewed",
+      "visibility": "public",
+      "content_sha256": null
+    }
+  ],
+  "claims": [
+    {
+      "id": "demo-claim",
+      "text": "В учебном уведомлении указана регистрация 1 ноября",
+      "epistemic_status": "supported",
+      "source_ids": [
+        "demo-source"
+      ],
+      "as_of": "2026-11-01",
+      "limitations": "Только синтетическая проверка"
+    }
+  ],
+  "threads": [
+    {
+      "id": "demo-thread",
+      "case_id": "demo-case",
+      "recipient_actor_id": null,
+      "requested_action": "Сообщить результат осмотра",
+      "procedure": "Учебная процедура без правовых выводов",
+      "submission_channel": "Учебный канал",
+      "status": "registered",
+      "sent_on": "2026-11-01",
+      "registered_on": "2026-11-01",
+      "registration_number": "DEMO-1",
+      "registration_source_ids": [
+        "demo-source"
+      ],
+      "deadline": {
+        "kind": "working",
+        "due_on": "2026-11-08",
+        "basis": "Учебная контрольная дата",
+        "source_ids": []
+      },
+      "next_action_id": "demo-action"
+    }
+  ],
+  "events": [
+    {
+      "id": "demo-event",
+      "case_id": "demo-case",
+      "thread_id": "demo-thread",
+      "event_type": "registered",
+      "occurred_on": "2026-11-01",
+      "recorded_on": "2026-11-01",
+      "summary": "Синтетическая регистрация",
+      "source_ids": [
+        "demo-source"
+      ]
+    }
+  ],
+  "commitments": [
+    {
+      "id": "demo-commitment",
+      "actor_id": "demo-actor",
+      "action": "Проверить наличие ответа",
+      "status": "agreed",
+      "due_on": "2026-11-08",
+      "condition": "",
+      "expected_evidence": "Учебная запись проверки",
+      "source_ids": [
+        "demo-source"
+      ],
+      "scope": "case",
+      "case_id": "demo-case",
+      "thread_id": "demo-thread"
+    }
+  ],
+  "outcomes": [
+    {
+      "id": "demo-outcome",
+      "case_id": "demo-case",
+      "kind": "institutional_change",
+      "description": "В учебном примере получена регистрация",
+      "source_ids": [
+        "demo-source"
+      ],
+      "attribution": "unknown",
+      "attribution_source_ids": [],
+      "alternative_explanations": "Не оцениваются в синтетическом примере",
+      "next_check": "Результат осмотра"
+    }
+  ],
+  "actions": [
+    {
+      "id": "demo-action",
+      "case_id": "demo-case",
+      "owner_actor_id": "demo-actor",
+      "task": "Проверить наличие ответа",
+      "purpose": "Выбрать следующий шаг",
+      "hours_estimate": 0.25,
+      "due_on": "2026-11-08",
+      "trigger": "Контрольная дата",
+      "expected_evidence": "Запись проверки",
+      "review_condition": "Получен ответ или уточнение",
+      "status": "planned",
+      "thread_id": "demo-thread"
+    }
+  ]
+}

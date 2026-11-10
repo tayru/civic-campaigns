@@ -91,5 +91,113 @@ class RegistryChecks(unittest.TestCase):
         self.rejects()
 
 
+class CurrentRegistryChecks(unittest.TestCase):
+    def setUp(self):
+        self.schema = read_json(ROOT / 'assets/case-schema.json')
+        self.data = read_json(ROOT / 'evals/fixtures/registry-v0.5-valid.json')
+
+    def rejects(self):
+        with self.assertRaises(ValueError):
+            validate_case(self.data, self.schema)
+
+    def test_current_fixture(self):
+        self.assertTrue(validate_case(self.data, self.schema))
+
+    def test_unknown_status_and_freshness(self):
+        self.data['cases'][0]['status'] = 'unknown'
+        self.data['cases'][0]['last_verified_on'] = None
+        self.assertTrue(validate_case(self.data, self.schema))
+
+    def test_freshness_is_per_case(self):
+        second = copy.deepcopy(self.data['cases'][0])
+        second['id'] = 'second-case'
+        second['last_verified_on'] = '2026-10-01'
+        self.data['cases'].append(second)
+        self.data['cases'][0]['last_verified_on'] = '2026-11-10'
+        self.assertTrue(validate_case(self.data, self.schema))
+        self.data['cases'][1]['last_verified_on'] = '2026-02-30'
+        self.rejects()
+
+    def test_missing_applicant_reference(self):
+        self.data['cases'][0]['applicant_actor_ids'] = ['missing']
+        self.rejects()
+
+    def test_current_case_requires_explicit_metadata(self):
+        del self.data['cases'][0]['applicant_actor_ids']
+        self.rejects()
+
+    def test_case_commitment_requires_case(self):
+        self.data['commitments'][0]['case_id'] = None
+        self.data['commitments'][0]['thread_id'] = None
+        self.rejects()
+
+    def test_commitment_cannot_point_to_other_case_thread(self):
+        second = copy.deepcopy(self.data['cases'][0])
+        second['id'] = 'second-case'
+        self.data['cases'].append(second)
+        self.data['commitments'][0]['case_id'] = 'second-case'
+        self.rejects()
+
+    def test_unknown_commitment_scope_is_explicit(self):
+        self.data['commitments'][0].update(scope='unknown', case_id=None, thread_id=None)
+        self.assertTrue(validate_case(self.data, self.schema))
+
+    def test_campaign_commitment_has_no_case_link(self):
+        self.data['commitments'][0]['scope'] = 'campaign'
+        self.rejects()
+        self.data['commitments'][0].update(case_id=None, thread_id=None)
+        self.assertTrue(validate_case(self.data, self.schema))
+
+    def test_same_file_cannot_be_two_sources(self):
+        self.data['sources'][0]['content_sha256'] = 'a' * 64
+        duplicate = copy.deepcopy(self.data['sources'][0])
+        duplicate['id'] = 'duplicate-file'
+        duplicate['locator'] = 'Renamed copy'
+        self.data['sources'].append(duplicate)
+        self.rejects()
+
+    def test_reply_reimport_cannot_duplicate_event(self):
+        self.data['events'][0]['event_type'] = 'replied'
+        self.data['events'][0]['reply_source_id'] = 'demo-source'
+        duplicate = copy.deepcopy(self.data['events'][0])
+        duplicate['id'] = 'duplicate-reply'
+        self.data['events'].append(duplicate)
+        self.rejects()
+
+    def test_one_document_can_reply_to_two_threads(self):
+        self.data['events'][0]['event_type'] = 'replied'
+        self.data['events'][0]['reply_source_id'] = 'demo-source'
+        second = copy.deepcopy(self.data['threads'][0])
+        second.update(id='second-thread', next_action_id=None)
+        self.data['threads'].append(second)
+        event = copy.deepcopy(self.data['events'][0])
+        event.update(id='second-reply', thread_id='second-thread')
+        self.data['events'].append(event)
+        self.assertTrue(validate_case(self.data, self.schema))
+
+    def test_different_replies_can_share_supporting_sources(self):
+        first_source = copy.deepcopy(self.data['sources'][0])
+        first_source['id'] = 'reply-one'
+        second_source = copy.deepcopy(first_source)
+        second_source['id'] = 'reply-two'
+        self.data['sources'].extend([first_source, second_source])
+        first = copy.deepcopy(self.data['events'][0])
+        first.update(id='reply-one', event_type='replied', reply_source_id='reply-one', source_ids=['reply-one', 'demo-source'])
+        second = copy.deepcopy(first)
+        second.update(id='reply-two', reply_source_id='reply-two', source_ids=['reply-two', 'demo-source'])
+        self.data['events'].extend([first, second])
+        self.assertTrue(validate_case(self.data, self.schema))
+
+    def test_reply_requires_primary_source(self):
+        self.data['events'][0]['event_type'] = 'replied'
+        self.rejects()
+
+    def test_next_action_must_match_thread(self):
+        second = copy.deepcopy(self.data['threads'][0])
+        second['id'] = 'second-thread'
+        self.data['threads'].append(second)
+        self.rejects()
+
+
 if __name__ == '__main__':
     unittest.main(verbosity=2)

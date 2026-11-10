@@ -42,9 +42,23 @@ def validate_case(data, schema):
     def reviewed(ids):
         return any(indexes['sources'][s]['availability'] == 'reviewed' for s in ids)
 
+    def case_thread(row):
+        case_id = row.get('case_id')
+        thread_id = row.get('thread_id')
+        link(case_id, 'cases', 'case_id')
+        link(thread_id, 'threads', 'thread_id')
+        if thread_id and indexes['threads'][thread_id]['case_id'] != case_id:
+            raise ValueError('Case and thread do not match')
+
     for name in collections:
         for row in data[name]:
             sources(row.get('source_ids', []))
+    for row in data['cases']:
+        for actor_id in row.get('applicant_actor_ids', []):
+            link(actor_id, 'actors', 'applicant_actor_id')
+    fingerprints = [row['content_sha256'] for row in data['sources'] if row.get('content_sha256')]
+    if len(fingerprints) != len(set(fingerprints)):
+        raise ValueError('Duplicate source content; reuse the existing source id')
     for row in data['claims']:
         if row['epistemic_status'] in ['supported', 'reported', 'conflicting'] and not row['source_ids']:
             raise ValueError('A sourced claim status requires source_ids')
@@ -69,13 +83,30 @@ def validate_case(data, schema):
             action = indexes['actions'][row['next_action_id']]
             if action['case_id'] is not None and action['case_id'] != row['case_id']:
                 raise ValueError('Thread and next action refer to different cases')
+            if action.get('thread_id') is not None and action['thread_id'] != row['id']:
+                raise ValueError('Next action belongs to another thread')
+    reply_keys = set()
     for row in data['events']:
         link(row['case_id'], 'cases', 'case_id')
         link(row['thread_id'], 'threads', 'thread_id')
         if row['thread_id'] and row['case_id'] and indexes['threads'][row['thread_id']]['case_id'] != row['case_id']:
             raise ValueError('Event and thread refer to different cases')
+        if data['schema_version'] == '0.5' and row['event_type'] == 'replied':
+            reply_source = row.get('reply_source_id')
+            if not row['thread_id'] or not reply_source or reply_source not in row['source_ids']:
+                raise ValueError('Reply requires a thread and source')
+            case_thread(row)
+            key = (row['thread_id'], reply_source)
+            if key in reply_keys:
+                raise ValueError('Duplicate reply for the same source and thread')
+            reply_keys.add(key)
     for row in data['commitments']:
         link(row['actor_id'], 'actors', 'actor_id')
+        case_thread(row)
+        if row.get('scope') == 'case' and row.get('case_id') is None:
+            raise ValueError('Case commitment requires case_id')
+        if row.get('scope') in ['campaign', 'unknown'] and (row.get('case_id') or row.get('thread_id')):
+            raise ValueError('Only case-scoped commitments can reference a case or thread')
         if row['status'] in ['agreed', 'formal_decision', 'fulfilled', 'missed', 'withdrawn'] and not row['source_ids']:
             raise ValueError('Commitment status requires a source')
     for row in data['outcomes']:
@@ -88,7 +119,7 @@ def validate_case(data, schema):
         if row['attribution'] in ['supported', 'directly_documented'] and not reviewed(row['attribution_source_ids']):
             raise ValueError('Supported attribution requires a reviewed source')
     for row in data['actions']:
-        link(row['case_id'], 'cases', 'case_id')
+        case_thread(row)
         link(row['owner_actor_id'], 'actors', 'owner_actor_id')
     return True
 
@@ -118,6 +149,7 @@ def validate_package(root=ROOT):
     schema = read_json(root / 'assets/case-schema.json')
     validate_case(read_json(root / 'assets/case-template.json'), schema)
     validate_case(read_json(root / 'evals/fixtures/registry-valid.json'), schema)
+    validate_case(read_json(root / 'evals/fixtures/registry-v0.5-valid.json'), schema)
     cases = read_json(root / 'evals/cases.json')
     ids = [c['id'] for c in cases]
     if len(ids) != len(set(ids)):

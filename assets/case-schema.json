@@ -1,10 +1,13 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "Civic campaign registry 0.4",
+  "title": "Civic case registry 0.5 with 0.4 compatibility",
   "type": "object",
   "properties": {
     "schema_version": {
-      "const": "0.4"
+      "enum": [
+        "0.4",
+        "0.5"
+      ]
     },
     "campaign": {
       "$ref": "#/$defs/campaign"
@@ -150,8 +153,34 @@
             "active",
             "waiting",
             "paused",
-            "closed"
+            "closed",
+            "unknown"
           ]
+        },
+        "topic": {
+          "type": "string"
+        },
+        "applicant_type": {
+          "enum": [
+            "individual",
+            "collective",
+            "unknown"
+          ]
+        },
+        "applicant_actor_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "last_verified_on": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date"
         }
       },
       "required": [
@@ -188,7 +217,8 @@
               "organizer",
               "participant",
               "media",
-              "other"
+              "other",
+              "applicant"
             ]
           },
           "uniqueItems": true
@@ -271,6 +301,13 @@
             "private",
             "needs_review"
           ]
+        },
+        "content_sha256": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[a-f0-9]{64}$"
         }
       },
       "required": [
@@ -444,6 +481,17 @@
             "minLength": 1
           },
           "uniqueItems": true
+        },
+        "reply_source_id": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       },
       "required": [
@@ -512,6 +560,35 @@
             "minLength": 1
           },
           "uniqueItems": true
+        },
+        "scope": {
+          "enum": [
+            "case",
+            "campaign",
+            "unknown"
+          ]
+        },
+        "case_id": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "thread_id": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       },
       "required": [
@@ -668,6 +745,17 @@
             "paused",
             "cancelled"
           ]
+        },
+        "thread_id": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       },
       "required": [
@@ -788,5 +876,69 @@
       ],
       "additionalProperties": false
     }
-  }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "schema_version": {
+            "const": "0.5"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "cases": {
+            "items": {
+              "required": [
+                "topic",
+                "applicant_type",
+                "applicant_actor_ids",
+                "last_verified_on"
+              ]
+            }
+          },
+          "commitments": {
+            "items": {
+              "required": [
+                "scope",
+                "case_id",
+                "thread_id"
+              ]
+            }
+          },
+          "actions": {
+            "items": {
+              "required": [
+                "thread_id"
+              ]
+            }
+          },
+          "sources": {
+            "items": {
+              "required": [
+                "content_sha256"
+              ]
+            }
+          },
+          "events": {
+            "items": {
+              "if": {
+                "properties": {
+                  "event_type": {
+                    "const": "replied"
+                  }
+                }
+              },
+              "then": {
+                "required": [
+                  "reply_source_id"
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
 }
