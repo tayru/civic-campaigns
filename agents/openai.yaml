@@ -1,0 +1,14 @@
+interface:
+  display_name: Жалобы, обращения и кампании в РФ
+  short_description: Жалобы, общение с чиновниками и наглядный учёт дел
+  default_prompt: 'Используй $civic-campaigns-rf: помоги с обращением или систематизируй
+    мои дела в РФ, покажи ближайшие действия и сроки.'
+  icon_small: assets/icon.svg
+  icon_large: assets/icon.svg
+policy:
+  products:
+  - chatgpt
+  - codex
+  - api
+  - atlas
+  allow_implicit_invocation: true

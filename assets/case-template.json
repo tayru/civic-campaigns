@@ -1,0 +1,22 @@
+{
+  "schema_version": "0.4",
+  "campaign": {
+    "id": "campaign-draft",
+    "title": "",
+    "jurisdiction": "",
+    "goal": "",
+    "bottleneck": "",
+    "change_hypothesis": "",
+    "weekly_hours": null,
+    "last_verified_on": null
+  },
+  "cases": [],
+  "actors": [],
+  "sources": [],
+  "claims": [],
+  "threads": [],
+  "events": [],
+  "commitments": [],
+  "outcomes": [],
+  "actions": []
+}

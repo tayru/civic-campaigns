@@ -1,0 +1,792 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Civic campaign registry 0.4",
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "const": "0.4"
+    },
+    "campaign": {
+      "$ref": "#/$defs/campaign"
+    },
+    "cases": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/case"
+      }
+    },
+    "actors": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/actor"
+      }
+    },
+    "sources": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/source"
+      }
+    },
+    "claims": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/claim"
+      }
+    },
+    "threads": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/thread"
+      }
+    },
+    "events": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/event"
+      }
+    },
+    "commitments": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/commitment"
+      }
+    },
+    "outcomes": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/outcome"
+      }
+    },
+    "actions": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/action"
+      }
+    }
+  },
+  "required": [
+    "schema_version",
+    "campaign",
+    "cases",
+    "actors",
+    "sources",
+    "claims",
+    "threads",
+    "events",
+    "commitments",
+    "outcomes",
+    "actions"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "campaign": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "title": {
+          "type": "string"
+        },
+        "jurisdiction": {
+          "type": "string"
+        },
+        "goal": {
+          "type": "string"
+        },
+        "bottleneck": {
+          "type": "string"
+        },
+        "change_hypothesis": {
+          "type": "string"
+        },
+        "weekly_hours": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "last_verified_on": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date"
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "jurisdiction",
+        "goal",
+        "bottleneck",
+        "change_hypothesis",
+        "weekly_hours",
+        "last_verified_on"
+      ],
+      "additionalProperties": false
+    },
+    "case": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "title": {
+          "type": "string"
+        },
+        "location_or_scope": {
+          "type": "string"
+        },
+        "requested_change": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "active",
+            "waiting",
+            "paused",
+            "closed"
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "location_or_scope",
+        "requested_change",
+        "status"
+      ],
+      "additionalProperties": false
+    },
+    "actor": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "label": {
+          "type": "string"
+        },
+        "roles": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "decision_maker",
+              "data_holder",
+              "implementer",
+              "funder",
+              "oversight",
+              "representative",
+              "partner",
+              "organizer",
+              "participant",
+              "media",
+              "other"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "position": {
+          "type": "string",
+          "enum": [
+            "supportive",
+            "opposed",
+            "undecided",
+            "unknown"
+          ]
+        },
+        "source_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "constraints": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "label",
+        "roles",
+        "position",
+        "source_ids",
+        "constraints"
+      ],
+      "additionalProperties": false
+    },
+    "source": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_type": {
+          "type": "string",
+          "enum": [
+            "official_document",
+            "official_publication",
+            "direct_observation",
+            "participant_report",
+            "media_report",
+            "research",
+            "other"
+          ]
+        },
+        "title": {
+          "type": "string"
+        },
+        "locator": {
+          "type": "string"
+        },
+        "dated_on": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date"
+        },
+        "availability": {
+          "type": "string",
+          "enum": [
+            "reviewed",
+            "referenced_only",
+            "unavailable"
+          ]
+        },
+        "visibility": {
+          "type": "string",
+          "enum": [
+            "public",
+            "private",
+            "needs_review"
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "source_type",
+        "title",
+        "locator",
+        "dated_on",
+        "availability",
+        "visibility"
+      ],
+      "additionalProperties": false
+    },
+    "claim": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "text": {
+          "type": "string"
+        },
+        "epistemic_status": {
+          "type": "string",
+          "enum": [
+            "supported",
+            "reported",
+            "hypothesis",
+            "unknown",
+            "conflicting"
+          ]
+        },
+        "source_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "as_of": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date"
+        },
+        "limitations": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "text",
+        "epistemic_status",
+        "source_ids",
+        "as_of",
+        "limitations"
+      ],
+      "additionalProperties": false
+    },
+    "deadline": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "legal",
+            "working",
+            "unknown"
+          ]
+        },
+        "due_on": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date"
+        },
+        "basis": {
+          "type": "string"
+        },
+        "source_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "kind",
+        "due_on",
+        "basis",
+        "source_ids"
+      ],
+      "additionalProperties": false
+    },
+    "event": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "case_id": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "thread_id": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "event_type": {
+          "type": "string",
+          "enum": [
+            "drafted",
+            "sent_reported",
+            "received",
+            "registered",
+            "forwarded",
+            "replied",
+            "meeting",
+            "commitment",
+            "decision",
+            "funding",
+            "contract",
+            "implementation_reported",
+            "verified",
+            "follow_up",
+            "other"
+          ]
+        },
+        "occurred_on": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date"
+        },
+        "recorded_on": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date"
+        },
+        "summary": {
+          "type": "string"
+        },
+        "source_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "id",
+        "case_id",
+        "thread_id",
+        "event_type",
+        "occurred_on",
+        "recorded_on",
+        "summary",
+        "source_ids"
+      ],
+      "additionalProperties": false
+    },
+    "commitment": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "actor_id": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "action": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "support",
+            "proposed",
+            "agreed",
+            "formal_decision",
+            "fulfilled",
+            "missed",
+            "withdrawn",
+            "unknown"
+          ]
+        },
+        "due_on": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date"
+        },
+        "condition": {
+          "type": "string"
+        },
+        "expected_evidence": {
+          "type": "string"
+        },
+        "source_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "id",
+        "actor_id",
+        "action",
+        "status",
+        "due_on",
+        "condition",
+        "expected_evidence",
+        "source_ids"
+      ],
+      "additionalProperties": false
+    },
+    "outcome": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "case_id": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "problem_change",
+            "institutional_change",
+            "community_capacity"
+          ]
+        },
+        "description": {
+          "type": "string"
+        },
+        "source_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "attribution": {
+          "type": "string",
+          "enum": [
+            "unknown",
+            "reported",
+            "supported",
+            "directly_documented"
+          ]
+        },
+        "attribution_source_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "alternative_explanations": {
+          "type": "string"
+        },
+        "next_check": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "case_id",
+        "kind",
+        "description",
+        "source_ids",
+        "attribution",
+        "attribution_source_ids",
+        "alternative_explanations",
+        "next_check"
+      ],
+      "additionalProperties": false
+    },
+    "action": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "case_id": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "owner_actor_id": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "task": {
+          "type": "string"
+        },
+        "purpose": {
+          "type": "string"
+        },
+        "hours_estimate": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "due_on": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date"
+        },
+        "trigger": {
+          "type": "string"
+        },
+        "expected_evidence": {
+          "type": "string"
+        },
+        "review_condition": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "proposed",
+            "planned",
+            "in_progress",
+            "done",
+            "paused",
+            "cancelled"
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "case_id",
+        "owner_actor_id",
+        "task",
+        "purpose",
+        "hours_estimate",
+        "due_on",
+        "trigger",
+        "expected_evidence",
+        "review_condition",
+        "status"
+      ],
+      "additionalProperties": false
+    },
+    "thread": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "case_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "recipient_actor_id": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "requested_action": {
+          "type": "string"
+        },
+        "procedure": {
+          "type": "string"
+        },
+        "submission_channel": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "draft",
+            "sent_reported",
+            "registered",
+            "forwarded",
+            "answered",
+            "closed",
+            "paused"
+          ]
+        },
+        "sent_on": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date"
+        },
+        "registered_on": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date"
+        },
+        "registration_number": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "registration_source_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "deadline": {
+          "$ref": "#/$defs/deadline"
+        },
+        "next_action_id": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "case_id",
+        "recipient_actor_id",
+        "requested_action",
+        "procedure",
+        "submission_channel",
+        "status",
+        "sent_on",
+        "registered_on",
+        "registration_number",
+        "registration_source_ids",
+        "deadline",
+        "next_action_id"
+      ],
+      "additionalProperties": false
+    }
+  }
+}
