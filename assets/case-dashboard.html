@@ -1,0 +1,606 @@
+<!doctype html>
+<html lang="ru">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src file:; frame-src file:; base-uri 'none'; form-action 'none'">
+<title>Обращения и кампании · Civic Campaigns RF</title>
+<style>
+:root {
+  color-scheme: light;
+  --paper: #fff;
+  --desk: #f3f6fb;
+  --ink: #0b1f33;
+  --muted: #56677b;
+  --rule: #dce4ee;
+  --blue: #0d4cd3;
+  --nav: #164394;
+  --red: #c62940;
+  --hover: #f1f6ff;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--desk); color: var(--ink); font: 16px/1.5 "Segoe UI", Arial, sans-serif; }
+button, input, select { font: inherit; color: inherit; }
+button, summary, select { cursor: pointer; }
+button { border: 1px solid var(--blue); border-radius: 6px; background: var(--paper); color: var(--blue); padding: 10px 16px; min-height: 44px; }
+button:hover { background: var(--hover); }
+button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-visible, a:focus-visible { outline: 3px solid var(--blue); outline-offset: 3px; }
+button.primary { color: var(--paper); background: var(--blue); border-color: var(--blue); }
+h1,h2,h3,p { margin: 0; }
+[hidden] { display: none !important; }
+.muted, small { color: var(--muted); }
+main { max-width: 1500px; min-height: 100vh; margin: 0 auto; background: var(--desk); }
+.masthead { padding: 20px 32px 24px; background: var(--paper); }
+.identity { display: flex; align-items: center; gap: 9px; color: var(--muted); font-size: 13px; }
+.flag { display: block; flex: none; width: 21px; height: 15px; border-top: 5px solid white; border-bottom: 5px solid #b74740; background: #295995; outline: 1px solid var(--rule); }
+.masthead-title { display: flex; justify-content: space-between; align-items: end; gap: 24px; padding-top: 8px; }
+h1 { font: 650 30px/1.25 "Segoe UI", Arial, sans-serif; letter-spacing: -.02em; color: var(--ink); }
+h1 span { color: var(--blue); }
+.header-tools { text-align: right; color: var(--muted); font-size: 13px; }
+.header-tools button { margin-bottom: 6px; }
+.workspace { display: grid; grid-template-columns: 230px minmax(0,1fr); }
+.switch { grid-column: 1 / -1; display: flex; gap: 8px; padding: 0 32px; background: var(--nav); }
+.switch button { color: #fff; background: transparent; border: 0; border-radius: 0; border-bottom: 4px solid transparent; padding: 16px 20px 12px; font-size: 16px; }
+.switch button:hover { background: #2455a9; }
+.switch button:focus-visible { outline-color: #fff; outline-offset: -5px; }
+.switch [aria-pressed=true] { border-bottom-color: #fff; background: #2455a9; font-weight: 600; }
+.sidebar { padding: 28px 20px 30px 24px; }
+.section-label { color: var(--muted); font-size: 14px; font-weight: 600; }
+.topic-list { display: grid; gap: 2px; margin: 12px 0 24px; }
+.topic-list button { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; color: var(--ink); background: transparent; text-align: left; border: 0; border-left: 3px solid transparent; border-radius: 0 6px 6px 0; padding: 10px 8px; font-size: 15px; min-height: 44px; overflow-wrap: anywhere; }
+.topic-list button:hover { background: #e7eef9; }
+.topic-list button[aria-pressed=true] { background: #e4edfc; color: var(--blue); font-weight: 600; border-left-color: var(--blue); }
+.topic-list small { flex: none; font-variant-numeric: tabular-nums; font-size: 12px; }
+.metrics { display: grid; gap: 7px; padding-top: 18px; border-top: 1px solid var(--rule); }
+.metric { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; color: var(--muted); font-size: 13px; }
+.metric b { order: 2; color: var(--ink); font-weight: 400; font-variant-numeric: tabular-nums; }
+.content { min-width: 0; margin: 24px 24px 32px 0; padding: 26px 28px 32px; border: 1px solid var(--rule); border-radius: 8px; background: var(--paper); }
+.view-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin-bottom: 19px; }
+h2 { font: 650 26px/1.3 "Segoe UI", Arial, sans-serif; }
+#clear-filters { padding: 0; min-height: 32px; border: 0; color: var(--blue); font-size: 13px; text-decoration: underline; text-underline-offset: 3px; }
+.filters { display: grid; grid-template-columns: minmax(180px,1fr) minmax(145px,.48fr); gap: 16px; }
+.filters label { font-size: 13px; color: var(--muted); }
+.filters .topic-field { display: none; }
+.filters input,.filters select { display: block; width: 100%; min-width: 0; margin-top: 6px; min-height: 48px; padding: 10px 12px; border: 1px solid #98aac1; border-radius: 6px; background: var(--paper); color: var(--ink); font-size: 16px; }
+#result { margin: 18px 0 10px; font-size: 13px; }
+.register-head { display: grid; grid-template-columns: 24px minmax(150px,1.15fr) 112px minmax(160px,1fr) 14px; gap: 16px; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); background: #f7f9fc; padding: 11px 8px; font-size: 12px; color: var(--muted); }
+.case { border-bottom: 1px solid var(--rule); overflow-wrap: anywhere; }
+.case summary { padding: 21px 8px; list-style: none; display: grid; grid-template-columns: 24px minmax(150px,1.15fr) 112px minmax(160px,1fr) 14px; gap: 16px; align-items: start; }
+.case summary::-webkit-details-marker { display: none; }
+.case summary:hover { background: var(--hover); }
+.case summary::after { content: ''; width: 7px; height: 7px; margin: 6px 2px 0; border-right: 2px solid var(--blue); border-bottom: 2px solid var(--blue); transform: rotate(45deg); }
+.case[open] summary::after { transform: rotate(225deg); margin-top: 10px; }
+.case[open] > summary { border-bottom: 1px solid var(--rule); }
+.case-number { font-size: 12px; font-variant-numeric: tabular-nums; color: var(--muted); padding-top: 3px; }
+.case-title { display: block; color: var(--blue); font-size: 17px; font-weight: 600; line-height: 1.45; }
+.case-topic { font-size: 12px; color: var(--muted); margin-top: 5px; }
+.case-status { font-size: 13px; padding-top: 2px; }
+.status-label { display: block; color: var(--ink); font-weight: 600; }
+.status-label.unknown { color: var(--muted); }
+.case-status small { display: block; margin-top: 5px; }
+.next-step { font-size: 14px; line-height: 1.55; }
+.next-label { display: none; }
+.details { padding: 24px 20px 28px 40px; background: #f7f9fc; display: grid; gap: 24px; }
+.details > p { max-width: 85ch; }
+.details h3, #rows > section h3 { font-size: 17px; color: var(--ink); font-weight: 650; border-bottom: 1px solid var(--rule); padding-bottom: 9px; }
+.detail-list { list-style: none; margin: 0; padding: 0; }
+.detail-list li { padding: 10px 0; border-bottom: 1px solid #e0e3e5; line-height: 1.65; font-size: 16px; }
+.detail-list li:last-child { border-bottom: 0; }
+.row { display: flex; justify-content: space-between; align-items: start; gap: 20px; padding: 20px 0; border-bottom: 1px solid var(--rule); overflow-wrap: anywhere; }
+.row h3 { font-weight: 600; font-size: 17px; margin: 5px 0; }
+.row p { margin-top: 5px; }
+.row button { flex: none; font-size: 12px; }
+.date { font-size: 13px; color: var(--blue); }
+.date.past { color: var(--red); }
+#rows > section { margin-top: 24px; }
+.empty, .error { padding: 24px 0; border-bottom: 1px solid var(--rule); }
+main > .empty, main > .error { margin: 0 32px 24px; }
+.error { color: var(--red); }
+.note { margin-top: 32px; padding-top: 14px; border-top: 1px solid var(--rule); font-size: 12px; color: var(--muted); }
+.document-footer { display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap; border-top: 1px solid var(--rule); background: var(--paper); padding: 20px 32px; font-size: 13px; color: var(--muted); }
+.file-tools { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; margin-top: 14px; font-size: 13px; }
+.file-tools select { min-height: 44px; padding: 8px; background: var(--paper); border: 1px solid #98aac1; border-radius: 6px; }
+.file-case-field { flex: 1 1 240px; min-width: 0; }
+.file-case-field select { display: block; width: 100%; max-width: 100%; }
+.case-files-button { justify-self: start; font-size: 14px; color: var(--blue); border-color: var(--blue); }
+.file-row { padding: 15px 0; border-bottom: 1px solid var(--rule); display: grid; grid-template-columns: 48px minmax(0,1fr) auto; gap: 14px; align-items: start; }
+.file-type { font: 600 11px/1.4 "Segoe UI",sans-serif; color: var(--blue); text-align: center; padding: 10px 2px; border: 1px solid var(--rule); border-radius: 3px; background: #f3f6fb; text-transform: uppercase; }
+.file-name { font-size: 16px; font-weight: 600; overflow-wrap: anywhere; }
+.file-note { color: var(--muted); font-size: 12px; margin-top: 4px; overflow-wrap: anywhere; }
+.file-buttons { display: flex; flex-wrap: wrap; align-items: center; gap: 9px; }
+.file-buttons button,.file-buttons a { font-size: 12px; }
+.file-buttons a { color: var(--blue); }
+.missing-file { color: var(--red); }
+.source-link { border: 0; border-bottom: 1px solid var(--rule); padding: 4px 0; min-height: 32px; text-align: left; color: var(--blue); overflow-wrap: anywhere; }
+dialog { width: min(1200px,96vw); max-width: 96vw; height: 92vh; max-height: 92vh; padding: 0; border: 1px solid var(--rule); border-radius: 8px; background: var(--paper); color: var(--ink); }
+dialog::backdrop { background: rgb(22 32 43 / 65%); }
+.viewer-layout { height: 100%; display: flex; flex-direction: column; }
+.viewer-header { padding: 16px 20px; border-bottom: 1px solid var(--rule); display: flex; gap: 15px; align-items: start; justify-content: space-between; background: #f3f6fb; }
+.viewer-header h2 { font: 600 17px/1.4 "Segoe UI",sans-serif; overflow-wrap: anywhere; }
+.viewer-header > div { min-width: 0; }
+.viewer-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; padding: 9px 20px; border-bottom: 1px solid var(--rule); font-size: 13px; }
+.viewer-toolbar button { padding: 5px 10px; min-height: 36px; }
+.viewer-toolbar a { color: var(--blue); }
+#viewer-position { margin-right: auto; color: var(--muted); }
+#image-tools { display: flex; gap: 5px; align-items: center; }
+#preview { flex: 1; min-height: 0; overflow: auto; padding: 16px; background: #e8ebee; }
+#preview img { display: block; margin: auto; max-width: 100%; height: auto; }
+#preview iframe { display: block; width: 100%; height: 100%; border: 0; background: white; }
+#preview pre { margin: 0; padding: 24px; background: var(--paper); color: var(--ink); white-space: pre-wrap; overflow-wrap: anywhere; font: 14px/1.7 Consolas,monospace; }
+.preview-message { padding: 15px; background: var(--paper); }
+.viewer-footer { padding: 8px 20px; font-size: 12px; color: var(--muted); border-top: 1px solid var(--rule); }
+@media(max-width:700px) {
+  .file-row { grid-template-columns: 36px minmax(0,1fr); gap: 10px; }
+  .file-buttons { grid-column: 2; }
+  .viewer-header,.viewer-toolbar { padding: 10px; }
+  .viewer-header h2 { font-size: 14px; }
+  #preview { padding: 6px; }
+  #preview pre { padding: 12px; }
+  .viewer-toolbar button { min-height: 44px; }
+}
+@media(max-width:1100px) {
+  .workspace { grid-template-columns: 200px minmax(0,1fr); }
+  .content { padding: 22px; margin-right: 20px; }
+  .sidebar { padding-left: 20px; padding-right: 18px; }
+  .register-head { display: none; }
+  .case summary { grid-template-columns: 24px minmax(0,1fr) 110px 14px; gap: 12px; }
+  .case summary::after { grid-column: 4; grid-row: 1; }
+  .next-step { grid-column: 2 / 4; padding-top: 3px; }
+  .next-label { display: inline; color: var(--muted); margin-right: 5px; }
+}
+@media(max-width:700px) {
+  .masthead { padding: 18px 16px; }
+  main > .empty, main > .error { margin-left: 16px; margin-right: 16px; }
+  .identity { font-size: 12px; }
+  .masthead-title { display: block; }
+  h1 { font-size: 26px; }
+  .header-tools { text-align: left; margin-top: 8px; }
+  .workspace { display: block; }
+  .sidebar { display: none; }
+  .switch { flex-wrap: wrap; justify-content: space-between; gap: 0 8px; padding: 0 16px; }
+  .switch button { min-height: 48px; padding: 12px 0 8px; font-size: 14px; }
+  .switch button:hover,.switch [aria-pressed=true] { background: transparent; }
+  .content { padding: 20px 16px 24px; margin: 12px 0 20px; border-left: 0; border-right: 0; border-radius: 0; }
+  .view-heading { flex-wrap: wrap; gap: 4px 12px; margin-bottom: 17px; }
+  h2 { font-size: 22px; }
+  .filters { gap: 9px; grid-template-columns: 1fr 1fr; }
+  .filters label:first-child { grid-column: 1 / -1; }
+  .filters .topic-field { display: block; }
+  .filters input,.filters select { font-size: 16px; }
+  .case summary { grid-template-columns: 22px minmax(0,1fr) 14px; gap: 8px; padding: 17px 0; }
+  .case summary::after { grid-column: 3; }
+  .case-status { grid-column: 2; display: flex; flex-wrap: wrap; gap: 8px; }
+  .case-status small { margin: 0; }
+  .next-step { grid-column: 2; }
+  .case-title { font-size: 16px; }
+  .details { padding: 17px 10px; margin: 0 -4px; }
+  .row { display: block; }
+  .row button { margin-top: 12px; }
+  .document-footer { padding: 18px 16px; font-size: 12px; }
+}
+</style>
+<main>
+  <header class="masthead">
+    <div class="identity"><span class="flag" aria-hidden="true"></span><span>Civic Campaigns RF</span></div>
+    <div class="masthead-title"><h1><span>Обращения</span> и кампании</h1><div class="header-tools"><input id="file" type="file" accept=".json,application/json" hidden><button id="load" class="primary" type="button">Открыть реестр</button><p id="meta" aria-live="polite">Реестр не выбран</p></div></div>
+  </header>
+  <p id="error" class="error" role="alert" hidden></p>
+  <p id="welcome" class="empty">Выберите рабочий реестр, чтобы открыть дела и переписку.</p>
+  <section id="board" class="workspace" hidden aria-label="Рабочий реестр">
+    <nav class="switch" aria-label="Разделы реестра">
+      <button data-view="cases" aria-pressed="true" type="button">Дела</button>
+      <button data-view="actions" aria-pressed="false" type="button">Задачи</button>
+      <button data-view="dates" aria-pressed="false" type="button">Сроки</button>
+      <button data-view="attention" aria-pressed="false" type="button">Проверить</button>
+      <button data-view="files" aria-pressed="false" type="button">Документы</button>
+    </nav>
+    <aside class="sidebar" aria-label="Темы и количество записей">
+      <h2 class="section-label">Темы</h2>
+      <nav id="topic-list" class="topic-list" aria-label="Выбрать тему"></nav>
+      <div class="metrics" aria-label="Всего в реестре"><div class="metric"><span>Дела</span><b id="mCases"></b></div><div class="metric"><span>Открытые задачи</span><b id="mActions"></b></div><div class="metric"><span>Назначенные даты</span><b id="mDates"></b></div></div>
+    </aside>
+    <div class="content">
+      <div class="view-heading"><h2 id="view-title">Все дела</h2><button id="clear-filters" type="button" hidden>Сбросить фильтры</button></div>
+      <div class="filters"><label><span id="search-label">Поиск по делам</span><input id="query" type="search" placeholder="Название, адресат, номер обращения"></label><label class="topic-field">Тема<select id="topic"></select></label><label>Состояние дела<select id="status"></select></label></div>
+      <div id="file-tools" class="file-tools" hidden>
+        <label>Формат <select id="file-kind">
+          <option value="">Все файлы</option>
+          <option value="pdf">PDF</option>
+          <option value="image">Изображения</option>
+          <option value="text">Текст и таблицы</option>
+          <option value="other">Другие форматы</option>
+          <option value="missing">Недостающие вложения</option>
+        </select></label>
+        <label class="file-case-field">Дело <select id="file-case"><option value="">Все дела и материалы архива</option></select></label>
+      </div>
+      <p id="result" class="muted" aria-live="polite"></p>
+      <div id="register-head" class="register-head" aria-hidden="true"><span>№</span><span>Предмет обращения</span><span>Состояние</span><span>Следующий шаг</span><span></span></div>
+      <div id="rows" class="list"></div>
+      <p class="note">Обновите реестр, чтобы увидеть новые записи.</p>
+    </div>
+  </section>
+  <footer class="document-footer"><span>Civic Campaigns RF</span><span>Данные и документы хранятся локально</span></footer>
+</main>
+<dialog id="file-viewer" aria-labelledby="viewer-title">
+  <div class="viewer-layout">
+    <header class="viewer-header"><div><h2 id="viewer-title">Документ</h2><p id="viewer-meta" class="file-note"></p></div><button id="close-viewer" type="button" aria-label="Закрыть просмотрщик">Закрыть</button></header>
+    <div class="viewer-toolbar"><button id="previous-file" type="button" aria-label="Предыдущий файл">←</button><span id="viewer-position" aria-live="polite"></span><button id="next-file" type="button" aria-label="Следующий файл">→</button><span id="image-tools" hidden><button id="zoom-out" type="button" aria-label="Уменьшить изображение">−</button><button id="zoom-fit" type="button">По ширине</button><button id="zoom-in" type="button" aria-label="Увеличить изображение">+</button></span><a id="open-original" target="_blank" rel="noopener noreferrer">Открыть отдельно</a><a id="download-file" download>Скачать</a></div>
+    <div id="preview"></div>
+    <p id="viewer-footer" class="viewer-footer">Файл хранится на вашем компьютере. Закрыть просмотр — Esc.</p>
+  </div>
+</dialog>
+<script id="portfolio-snapshot" type="application/json">null</script>
+<script>
+'use strict';
+const $=id=>document.getElementById(id), values=x=>Array.isArray(x)?x:[], word=x=>typeof x==='string'?x:'', order=new Intl.Collator('ru',{numeric:true});
+const caseStatus={active:'В работе',waiting:'Ожидание',paused:'Приостановлено',closed:'Закрыто',unknown:'Не уточнено'};
+const branchStatus={draft:'Черновик',sent_reported:'Сообщено об отправке',registered:'Зарегистрировано',forwarded:'Перенаправлено',answered:'Рассмотрено',closed:'Закрыто',paused:'Приостановлено'};
+const actionStatus={proposed:'Предложено',planned:'Запланировано',in_progress:'В работе',done:'Сделано',paused:'Приостановлено',cancelled:'Отменено'};
+const commitmentStatus={support:'Поддержка',proposed:'Намерение',agreed:'Согласовано',formal_decision:'Официальное решение',fulfilled:'Исполнено',missed:'Не исполнено',withdrawn:'Отозвано',unknown:'Неизвестно'};
+const events={drafted:'Черновик',sent_reported:'Сообщено об отправке',received:'Получение',registered:'Регистрация',forwarded:'Переадресация',replied:'Ответ',meeting:'Встреча',commitment:'Обязательство',decision:'Решение',funding:'Финансирование',contract:'Договор',implementation_reported:'Сообщено об исполнении',verified:'Проверка',follow_up:'Уточнение',other:'Другая запись'};
+const deadlineKinds={legal:'Срок по процедуре',working:'Рабочая дата',unknown:'Тип срока неизвестен'};
+const label=(dict,key)=>Object.hasOwn(dict,key)?dict[key]:word(key)||'Не указано';
+const realDay=x=>{if(!/^\d{4}-\d{2}-\d{2}$/.test(x??''))return '';const d=new Date(x+'T00:00:00Z');return !Number.isNaN(+d)&&d.toISOString().slice(0,10)===x?x:''};
+const nice=x=>realDay(x)?x.split('-').reverse().join('.'):'Дата не указана';
+const today=()=>{const d=new Date();return [d.getFullYear(),d.getMonth()+1,d.getDate()].map(x=>String(x).padStart(2,'0')).join('-')};
+const byDue=(a,b)=>(a.date||'9999').localeCompare(b.date||'9999')||order.compare(a.title,b.title);
+function el(tag,str='',cls=''){const n=document.createElement(tag);if(str)n.textContent=str;if(cls)n.className=cls;return n}
+function put(parent,tag,str,cls){const n=el(tag,str,cls);parent.append(n);return n}
+function lines(parent,title,items){if(!items.length)return;const box=put(parent,'section');put(box,'h3',title);const list=put(box,'ul','','detail-list');items.forEach(x=>put(list,'li',x))}
+function opt(parent,val,txt){const item=el('option',txt);item.value=val;parent.append(item)}
+function searchKey(s){return word(s).toLocaleLowerCase('ru').replaceAll('ё','е').trim()}
+let data, view='cases', loadVersion=0;
+function parse(raw){
+  if(raw?.format_version!=='1.0'||!Number.isInteger(raw.revision)||raw.revision<0||!Array.isArray(raw.registries))throw Error('Нужен реестр Civic Campaigns формата 1.0.');
+  const cases=[], actions=[], dates=[], regIds=new Set();
+  for(const r of raw.registries){
+    const collections=['cases','threads','actions','events','actors','sources','commitments','claims','outcomes'];
+    if(!['0.4','0.5','0.6'].includes(r?.schema_version)||!word(r?.campaign?.id)||regIds.has(r.campaign.id)||collections.some(k=>!Array.isArray(r[k])||r[k].some(x=>!x||typeof x!=='object'||Array.isArray(x))))throw Error('В файле есть неполный реестр или повторяющийся идентификатор.');
+    regIds.add(r.campaign.id);
+    const local=new Map(), actors=new Map(r.actors.map(a=>[a.id,word(a.label)])), sources=new Map(r.sources.map(s=>[s.id,word(s.title)]));
+    const sourceFiles=new Map(r.sources.map(source=>[source.id,source.file_id]));
+    const g={key:JSON.stringify([r.campaign.id]),title:word(r.campaign.title)||'Кампания',topic:word(r.campaign.title)||'Кампания',status:'',location:'',goal:'',actors,sources,sourceFiles,threads:[],events:[],actions:[],commitments:[],outcomes:[],claims:[],documents:[],evidence:[],attachments:[],requirements:[],intake:[]};
+    for(const c of r.cases){
+      if(!word(c.id)||local.has(c.id))throw Error('У дела отсутствует или повторяется идентификатор.');
+      const row={...g,...c,key:JSON.stringify([r.campaign.id,c.id]),title:word(c.title)||'Без названия',topic:word(c.topic)||'Без темы',location:word(c.location_or_scope),goal:word(c.requested_change),status:word(c.status)||'unknown',threads:[],events:[],actions:[],commitments:[],outcomes:[],claims:[],documents:[],evidence:[],attachments:[],requirements:[],intake:[]};
+      local.set(c.id,row);cases.push(row);
+    }
+    function owner(id){if(id==null)return g;if(!local.has(id))throw Error('В реестре есть запись со ссылкой на отсутствующее дело.');return local.get(id)}
+    const threadMap=new Map();
+    for(const t of r.threads){const c=owner(t.case_id);c.threads.push(t);threadMap.set(t.id,c);if(['sent_reported','registered','forwarded'].includes(t.status)&&realDay(t.deadline?.due_on)&&['legal','working'].includes(t.deadline.kind))dates.push({c,date:t.deadline.due_on,title:word(t.requested_action)||'Обращение',kind:label(deadlineKinds,t.deadline.kind),basis:t.deadline.basis})}
+    for(const a of r.actions){const c=owner(a.case_id??threadMap.get(a.thread_id)?.id);c.actions.push(a);if(['proposed','planned','in_progress'].includes(a.status)){const row={c,date:realDay(a.due_on),title:word(a.task)||'Следующий шаг',kind:label(actionStatus,a.status),basis:a.trigger};actions.push(row);if(row.date)dates.push({...row,kind:'Дата задачи · '+row.kind})}}
+    for(const a of r.commitments){const c=owner(a.case_id??threadMap.get(a.thread_id)?.id);c.commitments.push(a);if(realDay(a.due_on)&&!['fulfilled','withdrawn'].includes(a.status))dates.push({c,date:a.due_on,title:word(a.action)||'Обязательство',kind:'Обязательство · '+label(commitmentStatus,a.status),basis:a.condition})}
+    for(const a of r.events)owner(a.case_id??threadMap.get(a.thread_id)?.id).events.push(a);
+    for(const a of r.outcomes)owner(a.case_id).outcomes.push(a);
+    for(const a of r.claims)owner(Object.hasOwn(a,'case_id')?a.case_id:(local.size===1?local.keys().next().value:null)).claims.push(a);
+    const documentOwners=new Map();
+    for(const document of values(r.documents)){
+      const card=owner(document.case_id);
+      card.documents.push(document);
+      documentOwners.set(document.id,card);
+    }
+    for(const fact of values(r.evidence_records))owner(fact.case_id).evidence.push(fact);
+    for(const requirement of values(r.requirements))owner(requirement.case_id).requirements.push(requirement);
+    for(const attachment of values(r.attachments))(documentOwners.get(attachment.document_id)||g).attachments.push(attachment);
+    for(const entry of values(r.intake)){
+      const cards=new Set(entry.document_ids.map(id=>documentOwners.get(id)).filter(Boolean));
+      if(!cards.size)cards.add(g);
+      for(const card of cards)card.intake.push(entry);
+    }
+    for(const card of [g,...local.values()]){
+      card.links=values(r.thread_links).filter(link=>card.threads.some(t=>[link.from_thread_id,link.to_thread_id].includes(t.id)));
+    }
+    if(g.actions.length||g.commitments.length||g.events.length||g.outcomes.length||g.claims.length||g.documents.length||g.intake.length){g.campaign=true;cases.push(g)}
+  }
+  for(const c of cases)c.search=searchKey([c.title,c.topic,c.goal,c.location,...c.threads.flatMap(t=>[t.id,t.registration_number,t.requested_action,c.actors.get(t.recipient_actor_id)]),...c.events.map(e=>e.summary),...c.actions.map(a=>a.task),...c.evidence.map(e=>e.value),...c.attachments.map(a=>a.filename)].join(' '));
+  const files=new Map(values(raw.viewer_files).map(file=>[file.id,{...file,cards:[]}]));
+  for(const card of cases){
+    const sourceIds=new Set([...card.documents.map(d=>d.source_id),...card.intake.map(i=>i.source_id),...card.claims.flatMap(c=>c.source_ids),...card.events.flatMap(e=>e.source_ids)]);
+    card.fileIds=[...new Set([...sourceIds].map(id=>card.sourceFiles.get(id)).filter(id=>files.has(id)))];
+    for(const id of card.fileIds)files.get(id).cards.push(card);
+  }
+  return {revision:raw.revision,cases,actions:actions.sort(byDue),dates:dates.sort(byDue),files};
+}
+function matches(c){return (!$('topic').value||c.topic===$('topic').value)&&(!$('status').value||c.status===$('status').value)&&searchKey($('query').value).split(/\s+/).every(x=>c.search.includes(x))}
+function refs(c,ids){const list=values(ids).map(id=>c.sources.get(id)||word(id)).filter(Boolean);return list.length?' · Источник: '+list.join('; '):''}
+function threadName(c,id){const t=c.threads.find(item=>item.id===id);return t?[(c.actors.get(t.recipient_actor_id)||t.requested_action),t.registration_number?'№ '+t.registration_number:''].filter(Boolean).join(' · ')||id:id}
+const replyAvailability={full:'Полный ответ',partial:'Часть ответа',status_only:'Только отметка о рассмотрении',missing:'Ответ отсутствует',unknown:'Полнота ответа неизвестна'};
+const answerStatus={unassessed:'Не оценено',answered:'Рассмотрено',partial:'Частичный ответ',unanswered:'Ответа по пункту нет'};
+const implementationStatus={unknown:'Исполнение не установлено',reported:'Сообщено об исполнении',verified:'Исполнение проверено'};
+const attachmentStatus={mentioned:'Упомянуто, файл не получен',visible:'Видно в интерфейсе, файл не получен',received:'Получено'};
+const intakeStatus={pending:'Ожидает разбора',saved:'Внесено',partial:'Частично внесено',duplicate:'Повтор',needs_link:'Нужно определить дело',unreadable:'Нужна читаемая копия'};
+const evidenceKinds={portal_id:'Номер карточки',incoming_number:'Входящий номер',outgoing_number:'Номер письма',document_date:'Дата документа',portal_status_date:'Дата статуса',observation_date:'Дата наблюдения',plan_period:'Период плана',other:'Сведения документа'};
+function attentionReasons(card){
+  const reasons=[];
+  if(card.status==='unknown')reasons.push('Состояние дела неизвестно');
+  if(card.threads.some(t=>['partial','status_only','missing'].includes(t.reply_availability)))reasons.push('Нужен полный ответ');
+  const missing=card.attachments.filter(a=>a.status!=='received').length;
+  if(missing)reasons.push(`Недостающие вложения — ${missing}`);
+  if(card.evidence.some(e=>e.conflict_group))reasons.push('Расхождение в реквизитах или датах');
+  if(card.intake.some(e=>['pending','partial','needs_link','unreadable'].includes(e.status)))reasons.push('Есть неразобранные материалы');
+  if(!card.campaign&&!realDay(card.last_verified_on))reasons.push('Дата проверки неизвестна');
+  return reasons;
+}
+function safeFileUrl(value){
+  try{
+    const url=new URL(value);
+    if(url.protocol==='file:'&&!url.hostname&&!url.pathname.startsWith('//'))return url.href;
+  }catch{}
+  return '';
+}
+function fileSize(size){
+  if(typeof size!=='number')return '';
+  if(size<1024)return size+' Б';
+  if(size<1024*1024)return Math.round(size/1024)+' КБ';
+  return (size/(1024*1024)).toLocaleString('ru',{maximumFractionDigits:1})+' МБ';
+}
+let viewerFiles=[],viewerIndex=0,imageZoom=1;
+function openFile(file,sequence,page=null){
+  viewerFiles=sequence.filter(item=>item.available&&safeFileUrl(item.url));
+  viewerIndex=viewerFiles.findIndex(item=>item.id===file.id);
+  if(viewerIndex<0)return;
+  showFile(page);
+  if(!$('file-viewer').open)$('file-viewer').showModal();
+}
+function showFile(page=null){
+  const file=viewerFiles[viewerIndex];
+  const url=safeFileUrl(file.url);
+  $('viewer-title').textContent=file.name;
+  $('viewer-meta').textContent=[file.folder,file.extension.toUpperCase(),fileSize(file.size),page?'Страница '+page:''].filter(Boolean).join(' · ');
+  $('viewer-position').textContent=`${viewerIndex+1} из ${viewerFiles.length}`;
+  $('previous-file').disabled=viewerIndex===0;
+  $('next-file').disabled=viewerIndex===viewerFiles.length-1;
+  $('image-tools').hidden=file.kind!=='image';
+  $('open-original').href=url+(page&&file.kind==='pdf'?'#page='+page:'');
+  $('open-original').hidden=!['pdf','image','text'].includes(file.kind);
+  $('download-file').href=url;
+  $('download-file').download=file.name;
+  $('preview').replaceChildren();
+  $('viewer-footer').textContent='Файл хранится на вашем компьютере. Закрыть просмотр — Esc.';
+  imageZoom=1;
+  $('zoom-fit').textContent='По ширине';
+  if(file.kind==='image'){
+    const image=put($('preview'),'img');
+    image.alt=file.name;
+    image.src=url;
+    image.addEventListener('error',()=>{if(image.parentNode===$('preview'))$('preview').replaceChildren(el('p','Файл перемещён или недоступен. Попросите помощника обновить пути к документам.','preview-message'))});
+  }else if(file.kind==='pdf'){
+    const frame=put($('preview'),'iframe');
+    frame.title=file.name;
+    frame.src=url+'#page='+(Number.isInteger(page)&&page>0?page:1);
+    $('viewer-footer').textContent='Для увеличения и перехода по страницам используйте панель PDF. Если предпросмотр недоступен, нажмите «Открыть отдельно».';
+  }else if(file.kind==='text'&&typeof file.text==='string'){
+    put($('preview'),'pre',file.text||'Пустой файл');
+    $('viewer-footer').textContent=file.truncated?'Показан начальный фрагмент текста. Полная версия доступна по кнопке «Скачать».':'Текст на момент обновления описи. Оригинал доступен отдельно.';
+  }else{
+    put($('preview'),'p','Скачайте файл и откройте его в подходящем приложении.','preview-message');
+  }
+}
+function changeFile(delta){
+  const next=viewerIndex+delta;
+  if(next>=0&&next<viewerFiles.length){viewerIndex=next;showFile()}
+}
+function zoomImage(multiplier){
+  const image=$('preview').querySelector('img');
+  if(!image)return;
+  imageZoom=multiplier===0?1:Math.min(5,Math.max(0.25,imageZoom*multiplier));
+  image.style.width=Math.round(imageZoom*100)+'%';
+  image.style.maxWidth='none';
+  $('zoom-fit').textContent=imageZoom===1?'По ширине':Math.round(imageZoom*100)+'%';
+}
+function fileRow(file,sequence){
+  const row=el('article','','file-row');
+  row.dataset.fileId=file.id;
+  put(row,'span',file.extension||'файл','file-type');
+  const info=put(row,'div');
+  put(info,'p',file.name,'file-name');
+  put(info,'p',[file.folder,fileSize(file.size)].filter(Boolean).join(' · '),'file-note');
+  put(info,'p',file.cards.length?file.cards.map(card=>card.title).join(' / '):'Дело не указано','file-note');
+  const buttons=put(row,'div','','file-buttons');
+  if(file.available&&safeFileUrl(file.url)){
+    const preview=put(buttons,'button','Просмотр');
+    preview.type='button';
+    preview.addEventListener('click',()=>openFile(file,sequence));
+    const download=put(buttons,'a','Скачать');
+    download.href=safeFileUrl(file.url);
+    download.download=file.name;
+  }else{
+    put(buttons,'span',file.error||'Нет локальной копии','file-note missing-file');
+  }
+  return row;
+}
+function renderFiles(){
+  const query=searchKey($('query').value);
+  const kind=$('file-kind').value;
+  const scoped=card=>(!$('topic').value||card.topic===$('topic').value)&&(!$('status').value||card.status===$('status').value)&&(!$('file-case').value||card.key===$('file-case').value);
+  const files=[...data.files.values()].filter(file=>{
+    const cards=file.cards.filter(scoped);
+    if(($('topic').value||$('status').value||$('file-case').value)&&!cards.length)return false;
+    const searchable=searchKey([file.name,file.folder,...cards.map(card=>card.search)].join(' '));
+    return (!kind||kind===file.kind)&&query.split(/\s+/).every(term=>searchable.includes(term));
+  }).sort((a,b)=>order.compare(a.folder,b.folder)||order.compare(a.name,b.name));
+  const missing=data.cases.filter(scoped).flatMap(card=>card.attachments.filter(a=>a.status!=='received').map(attachment=>({card,attachment}))).filter(({card,attachment})=>{
+    const searchable=searchKey(card.search+' '+attachment.filename);
+    return query.split(/\s+/).every(term=>searchable.includes(term));
+  });
+  $('rows').replaceChildren(...files.map(file=>fileRow(file,files)));
+  if(!kind||kind==='missing'){
+    if(missing.length){
+      const section=put($('rows'),'section');
+      put(section,'h3',`Недостающие вложения — ${missing.length}`);
+      for(const {card,attachment} of missing){
+        const row=put(section,'article','','file-row');
+        put(row,'span','Нет','file-type missing-file');
+        const info=put(row,'div');
+        put(info,'p',attachment.filename,'file-name');
+        put(info,'p',card.title+' · '+(attachment.direction==='response'?'Приложение к ответу':'Приложение к обращению'),'file-note');
+        put(info,'p',attachment.notes,'file-note');
+        put(row,'span',label(attachmentStatus,attachment.status),'file-note missing-file');
+      }
+    }
+  }
+  $('result').textContent=`Файлы: ${files.length} из ${data.files.size}`+((!kind||kind==='missing')?` · Нет копий вложений: ${missing.length}`:'');
+  if(!data.files.size)put($('rows'),'p','Список файлов ещё не добавлен. Попросите помощника обновить просмотрщик и укажите папку с документами.','empty');
+  else if(!files.length&&!(missing.length&&(!kind||kind==='missing')))put($('rows'),'p','По этим условиям файлы не найдены.','empty');
+}
+function documentSections(parent,card){
+  const files=card.fileIds.map(id=>data.files.get(id));
+  if(files.length){
+    const section=put(parent,'section');
+    put(section,'h3',`Файлы дела — ${files.length}`);
+    for(const file of files)section.append(fileRow(file,files));
+  }
+  lines(parent,'Вложения',card.attachments.map(a=>`${a.filename} · ${a.direction==='response'?'К ответу':a.direction==='request'?'К обращению':'Направление неизвестно'} · ${label(attachmentStatus,a.status)}${a.notes?' · '+a.notes:''}`));
+  if(card.documents.length){
+    const section=put(parent,'section');
+    put(section,'h3','Документы внутри файлов');
+    const list=put(section,'ul','','detail-list');
+    for(const document of card.documents){
+      const item=put(list,'li');
+      put(item,'p',`${document.title}${document.page_start?' · стр. '+document.page_start+'–'+document.page_end:''}${document.applicant_relation==='other'?' · другой заявитель':''}${document.duplicate_of?' · повтор документа '+document.duplicate_of:''}`);
+      const file=data.files.get(card.sourceFiles.get(document.source_id));
+      if(file?.available&&safeFileUrl(file.url)){
+        const open=put(item,'button',document.page_start?'Открыть с указанной страницы':'Открыть документ','source-link');
+        open.type='button';
+        open.addEventListener('click',()=>openFile(file,files,document.page_start));
+      }
+    }
+  }
+  lines(parent,'Разбор документов',card.intake.map(e=>`${card.sources.get(e.source_id)||e.source_id} · ${label(intakeStatus,e.status)} · ${e.notes}${e.saved_revision?' · версия '+e.saved_revision:''}`));
+}
+function caseCard(c){
+  const d=el('details','','case');
+  d.dataset.key=c.key;
+  const summary=put(d,'summary');
+  const position=String(data.cases.indexOf(c)+1).padStart(2,'0');
+  put(summary,'span',position,'case-number').setAttribute('aria-label','Позиция в реестре '+position);
+  const heading=put(summary,'div');
+  put(heading,'strong',c.title,'case-title');
+  put(heading,'p',c.campaign?'Общие материалы':c.topic,'case-topic');
+  const state=put(summary,'div','','case-status');
+  put(state,'span',c.campaign?'Для разбора':label(caseStatus,c.status),'status-label'+(c.status==='unknown'?' unknown':''));
+  put(state,'small',`Файлов: ${c.fileIds.length}`);
+  const next=c.actions.find(a=>['proposed','planned','in_progress'].includes(a.status));
+  const nextCell=put(summary,'p','','next-step');
+  put(nextCell,'span','Следующий шаг —','next-label');
+  nextCell.append(document.createTextNode(next?word(next.task):c.campaign?'Уточнить принадлежность материалов':'Следующий шаг не назначен'));
+  const b=put(d,'div','','details');if(c.location)put(b,'p',c.location,'muted');if(c.goal)put(b,'p','Чего добиваемся: '+c.goal);if(!c.campaign)put(b,'p','Последняя проверка: '+(realDay(c.last_verified_on)?nice(c.last_verified_on):'дата не указана'),'muted');
+  if(c.fileIds.length){
+    const filesButton=put(b,'button',`Открыть файлы дела (${c.fileIds.length})`,'case-files-button');
+    filesButton.type='button';
+    filesButton.addEventListener('click',()=>{
+      $('query').value='';
+      $('file-kind').value='';
+      $('file-case').value=c.key;
+      switchTo('files');
+      $('file-case').focus();
+      $('view-title').scrollIntoView({block:'start'});
+    });
+  }
+  if(view==='files'){documentSections(b,c);return d}
+  lines(b,'Что известно',c.claims.map(a=>word(a.text)+refs(c,a.source_ids)));
+  lines(b,'Переписка',c.threads.map(t=>[word(t.requested_action),c.actors.get(t.recipient_actor_id),label(branchStatus,t.status),word(t.registration_number)?'рег. № '+t.registration_number:'',realDay(t.sent_on)?'отправка '+nice(t.sent_on):'',realDay(t.registered_on)?'регистрация '+nice(t.registered_on):'',realDay(t.deadline?.due_on)?`${label(deadlineKinds,t.deadline.kind)}: ${nice(t.deadline.due_on)}`:'дата контроля не указана'].filter(Boolean).join(' · ')));
+  lines(b,'Задачи',c.actions.map(a=>`${a.task} · ${label(actionStatus,a.status)}${realDay(a.due_on)?' · '+nice(a.due_on):''}${a.trigger?' · '+a.trigger:''}`));
+  lines(b,'Обязательства',c.commitments.map(a=>`${a.action} · ${label(commitmentStatus,a.status)}${realDay(a.due_on)?' · '+nice(a.due_on):''}${a.condition?' · '+a.condition:''}${refs(c,a.source_ids)}`));
+  lines(b,'Результаты',c.outcomes.map(a=>word(a.description)+refs(c,a.source_ids)));
+  lines(b,'Требует уточнения',attentionReasons(c));
+  lines(b,'Ответы',c.threads.map(t=>`${threadName(c,t.id)} · ${label(replyAvailability,t.reply_availability||'unknown')}`));
+  lines(b,'Связанные обращения',c.links.map(link=>`${threadName(c,link.from_thread_id)} → ${threadName(c,link.to_thread_id)} · ${link.relation==='possible_relation'?'Связь требует подтверждения':link.relation==='related_other_applicant'?'Другой заявитель':link.relation==='forwarded_to'?'Переадресация':'Продолжение переписки'} · ${link.notes}${refs(c,link.source_ids)}`));
+  lines(b,'Требования и исполнение',c.requirements.map(q=>`${q.text} · ${label(answerStatus,q.answer_status)} · ${q.answer_summary} · ${label(implementationStatus,q.implementation)}${refs(c,q.answer_source_ids)}`));
+  lines(b,'Номера и даты',c.evidence.map(e=>`${label(evidenceKinds,e.kind)} · ${e.value} · ${e.location} · ${c.documents.find(d=>d.id===e.document_id)?.title||e.document_id}${e.conflict_group?' · требует сверки':''}`));
+  documentSections(b,c);
+  lines(b,'Хронология',[...c.events].sort((a,b)=>(realDay(b.occurred_on)||'').localeCompare(realDay(a.occurred_on)||'')).map(a=>`${nice(a.occurred_on)} · ${label(events,a.event_type)}${a.thread_id?' · '+threadName(c,a.thread_id):''} · ${a.summary}${refs(c,a.source_ids)}`));
+  return d;
+}
+const viewLabels={
+  cases:'Дела',
+  actions:'Задачи',
+  dates:'Сроки и ожидаемые ответы',
+  attention:'Что нужно проверить',
+  files:'Документы'
+};
+function switchTo(name){
+  view=name;
+  document.querySelectorAll('[data-view]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.view===name)));
+  $('view-title').textContent=viewLabels[name];
+  $('search-label').textContent=name==='files'?'Поиск по документам':'Поиск по делам';
+  $('query').placeholder=name==='files'?'Имя файла, дело, номер обращения':'Название, адресат, номер обращения';
+  $('register-head').hidden=!['cases','attention'].includes(name);
+  $('file-tools').hidden=name!=='files';
+  render();
+}
+function row(x){const r=el('article','','row'), b=put(r,'div'), past=x.date&&x.date<today();put(b,'small',x.c.title);put(b,'h3',x.title);put(b,'p',`${x.kind} · ${x.date?nice(x.date):'без назначенной даты'}${past?' · дата прошла':''}`,past?'date past':'date');if(x.basis)put(b,'p',word(x.basis),'muted');const open=put(r,'button',x.c.campaign?'Открыть кампанию':'Открыть дело');open.type='button';open.addEventListener('click',()=>{switchTo('cases');const d=[...$('rows').children].find(n=>n.dataset.key===x.c.key);if(d){d.open=true;d.querySelector('summary').focus();d.scrollIntoView({block:'nearest'})}});return r}
+function render(){
+  if(!data)return;
+  document.querySelectorAll('[data-topic]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.topic===$('topic').value)));
+  $('clear-filters').hidden=!($('query').value||$('topic').value||$('status').value||(view==='files'&&($('file-kind').value||$('file-case').value)));
+  if(view==='files'){renderFiles();return}
+  const cards=data.cases.filter(matches);
+  const cardView=['cases','attention','files'].includes(view);
+  let list=cards;
+  if(view==='attention')list=cards.filter(c=>attentionReasons(c).length);
+  if(view==='files')list=cards.filter(c=>c.documents.length||c.intake.length);
+  if(view==='actions')list=data.actions.filter(x=>matches(x.c));
+  if(view==='dates')list=data.dates.filter(x=>matches(x.c));
+  $('rows').replaceChildren(...list.map(cardView?caseCard:row));
+  const shared=list.filter(c=>c.campaign).length;
+  if(cardView)$('result').textContent=`Дела: ${list.length-shared} из ${data.cases.filter(c=>!c.campaign).length}`+(shared?` · Общие материалы: ${shared}`:'');
+  else $('result').textContent=(view==='dates'?`Назначенные даты: ${list.length} · Сегодня ${nice(today())}`:`Задачи: ${list.length} из ${data.actions.length}`);
+  if(!list.length)put($('rows'),'p',view==='dates'?'Назначенных дат нет.':'По этим условиям записи не найдены.','empty');
+  if(view==='dates'){
+    const unknown=cards.flatMap(c=>c.threads.filter(t=>!realDay(t.deadline?.due_on)&&!['closed','answered'].includes(t.status)).map(t=>`${c.title} · ${t.requested_action} · дата контроля не установлена`));
+    lines($('rows'),'Ожидания без установленной даты',unknown);
+    lines($('rows'),'Плановые периоды',cards.flatMap(c=>c.evidence.filter(e=>['month','quarter'].includes(e.precision)).map(e=>`${c.title} · ${e.value} · ${e.location}`)));
+    const undatedActions=data.actions.filter(x=>matches(x.c)&&!x.date).length;
+    if(undatedActions)put($('rows'),'p',`Без даты: ${undatedActions}. Посмотреть их можно в разделе «Задачи».`,'muted');
+  }
+}
+function showPortfolio(loaded, caption){
+    data=loaded;
+    $('meta').textContent=`${caption} · версия ${data.revision}`;$('welcome').hidden=true;$('board').hidden=false;
+    $('mCases').textContent=data.cases.filter(x=>!x.campaign).length;$('mActions').textContent=data.actions.length;$('mDates').textContent=data.dates.length;
+    $('query').value='';$('topic').replaceChildren();opt($('topic'),'','Все темы');[...new Set(data.cases.map(c=>c.topic))].sort(order.compare).forEach(t=>opt($('topic'),t,t));
+    $('topic-list').replaceChildren();
+    for(const option of $('topic').options){
+      const button=put($('topic-list'),'button');
+      button.type='button';
+      button.dataset.topic=option.value;
+      put(button,'span',option.textContent);
+      const count=option.value?data.cases.filter(c=>c.topic===option.value).length:data.cases.length;
+      put(button,'small',String(count)).setAttribute('aria-label',`Карточек: ${count}`);
+      button.addEventListener('click',()=>{$('topic').value=option.value;render()});
+    }
+    $('file-case').replaceChildren();opt($('file-case'),'','Все дела и материалы архива');
+    data.cases.forEach(card=>opt($('file-case'),card.key,card.title));
+    $('file-kind').value='';
+    $('status').replaceChildren();opt($('status'),'','Все статусы');Object.entries(caseStatus).forEach(([id,text])=>opt($('status'),id,text));switchTo('cases');
+}
+function showError(err){$('error').textContent=err instanceof SyntaxError?'Не удалось прочитать реестр: файл повреждён или имеет другой формат.':`Не удалось открыть реестр. ${err.message}`;$('error').hidden=false}
+$('load').addEventListener('click',()=>$('file').click());
+$('file').addEventListener('change',async e=>{const file=e.target.files[0];e.target.value='';if(!file)return;const version=++loadVersion;$('error').hidden=true;
+  try{const loaded=parse(JSON.parse((await file.text()).replace(/^\uFEFF/,'')));if(version===loadVersion)showPortfolio(loaded,file.name)}catch(err){if(version===loadVersion)showError(err)}
+});
+$('query').addEventListener('input',render);['topic','status'].forEach(id=>$(id).addEventListener('change',render));document.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',()=>switchTo(b.dataset.view)));
+$('file-kind').addEventListener('change',render);
+$('file-case').addEventListener('change',render);
+$('clear-filters').addEventListener('click',()=>{['query','topic','status','file-kind','file-case'].forEach(id=>$(id).value='');render();$('query').focus()});
+$('close-viewer').addEventListener('click',()=>$('file-viewer').close());
+$('file-viewer').addEventListener('close',()=>{if(!$('file-viewer').open){$('preview').replaceChildren();viewerFiles=[]}});
+$('previous-file').addEventListener('click',()=>changeFile(-1));
+$('next-file').addEventListener('click',()=>changeFile(1));
+$('zoom-in').addEventListener('click',()=>zoomImage(1.5));
+$('zoom-out').addEventListener('click',()=>zoomImage(1/1.5));
+$('zoom-fit').addEventListener('click',()=>zoomImage(0));
+$('file-viewer').addEventListener('keydown',event=>{
+  if(event.key==='ArrowRight'){event.preventDefault();changeFile(1)}
+  if(event.key==='ArrowLeft'){event.preventDefault();changeFile(-1)}
+});
+try{
+  const snapshot=JSON.parse($('portfolio-snapshot').textContent);
+  if(snapshot){
+    showPortfolio(parse(snapshot),'Сохранённая копия');
+    $('load').hidden=true;
+    document.querySelector('.note').textContent='После сохранения изменений обновите страницу.';
+  }
+}catch(err){showError(err)}
+</script>
+</html>

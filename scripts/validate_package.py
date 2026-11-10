@@ -11,6 +11,7 @@ except ImportError:
     raise SystemExit('NOT RUN: Python package jsonschema is required; no dependency was installed.')
 
 ROOT = Path(__file__).resolve().parents[1]
+EXTENDED_COLLECTIONS = ('documents', 'evidence_records', 'attachments', 'requirements', 'thread_links', 'intake')
 
 
 def read_json(path):
@@ -23,10 +24,10 @@ def validate_case(data, schema):
     errors = [f'{"/".join(map(str, e.absolute_path))}: {e.message}' for e in validator.iter_errors(data)]
     if errors:
         raise ValueError('\n'.join(errors[:12]))
-    collections = ['cases', 'actors', 'sources', 'claims', 'threads', 'events', 'commitments', 'outcomes', 'actions']
+    collections = ['cases', 'actors', 'sources', 'claims', 'threads', 'events', 'commitments', 'outcomes', 'actions', *EXTENDED_COLLECTIONS]
     indexes = {}
     for name in collections:
-        rows = data[name]
+        rows = data.get(name, [])
         indexes[name] = {row['id']: row for row in rows}
         if len(indexes[name]) != len(rows):
             raise ValueError(f'Duplicate ids in {name}')
@@ -51,7 +52,7 @@ def validate_case(data, schema):
             raise ValueError('Case and thread do not match')
 
     for name in collections:
-        for row in data[name]:
+        for row in data.get(name, []):
             sources(row.get('source_ids', []))
     for row in data['cases']:
         for actor_id in row.get('applicant_actor_ids', []):
@@ -60,11 +61,14 @@ def validate_case(data, schema):
     if len(fingerprints) != len(set(fingerprints)):
         raise ValueError('Duplicate source content; reuse the existing source id')
     for row in data['claims']:
+        case_thread(row)
         if row['epistemic_status'] in ['supported', 'reported', 'conflicting'] and not row['source_ids']:
             raise ValueError('A sourced claim status requires source_ids')
         if row['epistemic_status'] == 'supported' and not reviewed(row['source_ids']):
             raise ValueError('A supported claim requires a reviewed source')
     for row in data['threads']:
+        for actor_id in row.get('applicant_actor_ids', []):
+            link(actor_id, 'actors', 'applicant_actor_id')
         link(row['case_id'], 'cases', 'case_id')
         link(row['recipient_actor_id'], 'actors', 'recipient_actor_id')
         link(row['next_action_id'], 'actions', 'next_action_id')
@@ -91,7 +95,7 @@ def validate_case(data, schema):
         link(row['thread_id'], 'threads', 'thread_id')
         if row['thread_id'] and row['case_id'] and indexes['threads'][row['thread_id']]['case_id'] != row['case_id']:
             raise ValueError('Event and thread refer to different cases')
-        if data['schema_version'] == '0.5' and row['event_type'] == 'replied':
+        if data['schema_version'] in ['0.5', '0.6'] and row['event_type'] == 'replied':
             reply_source = row.get('reply_source_id')
             if not row['thread_id'] or not reply_source or reply_source not in row['source_ids']:
                 raise ValueError('Reply requires a thread and source')
@@ -121,10 +125,75 @@ def validate_case(data, schema):
     for row in data['actions']:
         case_thread(row)
         link(row['owner_actor_id'], 'actors', 'owner_actor_id')
+    for row in data.get('documents', []):
+        case_thread(row)
+        link(row['source_id'], 'sources', 'source_id')
+        start, end = row['page_start'], row['page_end']
+        if (start is None) != (end is None) or (start is not None and end < start):
+            raise ValueError('Invalid document page range')
+        link(row['duplicate_of'], 'documents', 'duplicate_of')
+        visited = {row['id']}
+        target = row['duplicate_of']
+        while target:
+            if target in visited:
+                raise ValueError('Cyclic document duplicate link')
+            visited.add(target)
+            link(target, 'documents', 'duplicate_of')
+            target = indexes['documents'][target]['duplicate_of']
+    for row in data.get('evidence_records', []):
+        case_thread(row)
+        link(row['document_id'], 'documents', 'document_id')
+        document = indexes['documents'][row['document_id']]
+        if document['case_id'] != row['case_id'] or document['thread_id'] != row['thread_id']:
+            raise ValueError('Evidence and document scope do not match')
+        precision, value = row['precision'], row['value']
+        if precision == 'day' and not FormatChecker().conforms(value, 'date'):
+            raise ValueError('Invalid evidence date')
+        if precision == 'month' and not re.fullmatch(r'\d{4}-(0[1-9]|1[0-2])', value):
+            raise ValueError('Invalid evidence month')
+        if precision == 'quarter' and not re.fullmatch(r'\d{4}-Q[1-4]', value):
+            raise ValueError('Invalid evidence quarter')
+        if row['kind'] in ['portal_id', 'incoming_number', 'outgoing_number'] and precision != 'exact':
+            raise ValueError('Identifier requires exact precision')
+    for row in data.get('attachments', []):
+        link(row['document_id'], 'documents', 'document_id')
+        link(row['received_source_id'], 'sources', 'received_source_id')
+        if (row['status'] == 'received') != bool(row['received_source_id']):
+            raise ValueError('Received attachment requires its own source')
+        if row['status'] == 'received' and indexes['sources'][row['received_source_id']]['availability'] != 'reviewed':
+            raise ValueError('Attachment source is not available')
+    for row in data.get('requirements', []):
+        case_thread(row)
+        if not row['case_id'] or not row['thread_id']:
+            raise ValueError('Requirement needs a case and thread')
+        for field in ['request_source_ids', 'answer_source_ids', 'implementation_source_ids']:
+            sources(row[field])
+        if row['answer_status'] != 'unassessed' and not (reviewed(row['request_source_ids']) and reviewed(row['answer_source_ids'])):
+            raise ValueError('Answer assessment requires reviewed request and reply')
+        if row['implementation'] != 'unknown' and not row['implementation_source_ids']:
+            raise ValueError('Implementation requires evidence')
+        if row['implementation'] == 'verified' and not reviewed(row['implementation_source_ids']):
+            raise ValueError('Verified implementation requires reviewed evidence')
+    for row in data.get('thread_links', []):
+        link(row['from_thread_id'], 'threads', 'from_thread_id')
+        link(row['to_thread_id'], 'threads', 'to_thread_id')
+        if row['from_thread_id'] == row['to_thread_id'] or not row['source_ids']:
+            raise ValueError('Thread relation needs distinct threads and evidence')
+    for row in data.get('intake', []):
+        link(row['source_id'], 'sources', 'source_id')
+        for document_id in row['document_ids']:
+            link(document_id, 'documents', 'document_id')
+            if indexes['documents'][document_id]['source_id'] != row['source_id']:
+                raise ValueError('Intake document belongs to another source')
+        if row['status'] in ['saved', 'partial', 'duplicate'] and not row['document_ids']:
+            raise ValueError('Processed intake requires document records')
     return True
 
 
 def validate_package(root=ROOT):
+    panel = root / 'assets/case-dashboard.html'
+    if panel.exists() and '<script id="portfolio-snapshot" type="application/json">null</script>' not in panel.read_text(encoding='utf-8'):
+        raise ValueError('Skill package must contain an empty dashboard template')
     skill = (root / 'SKILL.md').read_text(encoding='utf-8')
     if not skill.startswith('---\n'):
         raise ValueError('Missing frontmatter')

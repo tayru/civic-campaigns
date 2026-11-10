@@ -1,0 +1,10 @@
+# Working portfolios and generated views belong outside this repository.
+portfolio.json
+*-dashboard.html
+!assets/case-dashboard.html
+.history/
+*.lock
+__pycache__/
+private/
+workspaces/
+*.viewer.json

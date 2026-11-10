@@ -1,5 +1,5 @@
 {
-  "schema_version": "0.5",
+  "schema_version": "0.6",
   "campaign": {
     "id": "campaign-draft",
     "title": "",
@@ -18,5 +18,11 @@
   "events": [],
   "commitments": [],
   "outcomes": [],
-  "actions": []
+  "actions": [],
+  "documents": [],
+  "evidence_records": [],
+  "attachments": [],
+  "requirements": [],
+  "thread_links": [],
+  "intake": []
 }

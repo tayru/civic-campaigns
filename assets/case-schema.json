@@ -1,12 +1,13 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "Civic case registry 0.5 with 0.4 compatibility",
+  "title": "Civic case registry 0.6 with 0.4 and 0.5 compatibility",
   "type": "object",
   "properties": {
     "schema_version": {
       "enum": [
         "0.4",
-        "0.5"
+        "0.5",
+        "0.6"
       ]
     },
     "campaign": {
@@ -64,6 +65,42 @@
       "type": "array",
       "items": {
         "$ref": "#/$defs/action"
+      }
+    },
+    "documents": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/document"
+      }
+    },
+    "evidence_records": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/evidence_record"
+      }
+    },
+    "attachments": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/attachment"
+      }
+    },
+    "requirements": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/requirement"
+      }
+    },
+    "thread_links": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/thread_link"
+      }
+    },
+    "intake": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/intake_entry"
       }
     }
   },
@@ -358,6 +395,20 @@
         },
         "limitations": {
           "type": "string"
+        },
+        "case_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
+        },
+        "thread_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
         }
       },
       "required": [
@@ -857,6 +908,23 @@
               "type": "null"
             }
           ]
+        },
+        "reply_availability": {
+          "enum": [
+            "full",
+            "partial",
+            "status_only",
+            "missing",
+            "unknown"
+          ]
+        },
+        "applicant_actor_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
         }
       },
       "required": [
@@ -875,6 +943,379 @@
         "next_action_id"
       ],
       "additionalProperties": false
+    },
+    "document": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "case_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
+        },
+        "thread_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
+        },
+        "source_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "title": {
+          "type": "string"
+        },
+        "page_start": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1
+        },
+        "page_end": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1
+        },
+        "duplicate_of": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
+        },
+        "applicant_relation": {
+          "enum": [
+            "own",
+            "other",
+            "unknown"
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "case_id",
+        "thread_id",
+        "source_id",
+        "title",
+        "page_start",
+        "page_end",
+        "duplicate_of",
+        "applicant_relation"
+      ],
+      "additionalProperties": false
+    },
+    "evidence_record": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "case_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
+        },
+        "thread_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
+        },
+        "document_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": {
+          "enum": [
+            "portal_id",
+            "incoming_number",
+            "outgoing_number",
+            "document_date",
+            "portal_status_date",
+            "observation_date",
+            "plan_period",
+            "other"
+          ]
+        },
+        "value": {
+          "type": "string",
+          "minLength": 1
+        },
+        "precision": {
+          "enum": [
+            "exact",
+            "day",
+            "month",
+            "quarter",
+            "unknown"
+          ]
+        },
+        "location": {
+          "type": "string",
+          "minLength": 1
+        },
+        "conflict_group": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
+        }
+      },
+      "required": [
+        "id",
+        "case_id",
+        "thread_id",
+        "document_id",
+        "kind",
+        "value",
+        "precision",
+        "location",
+        "conflict_group"
+      ],
+      "additionalProperties": false
+    },
+    "attachment": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "document_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "direction": {
+          "enum": [
+            "request",
+            "response",
+            "unknown"
+          ]
+        },
+        "filename": {
+          "type": "string",
+          "minLength": 1
+        },
+        "status": {
+          "enum": [
+            "mentioned",
+            "visible",
+            "received"
+          ]
+        },
+        "received_source_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
+        },
+        "notes": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "document_id",
+        "direction",
+        "filename",
+        "status",
+        "received_source_id",
+        "notes"
+      ],
+      "additionalProperties": false
+    },
+    "requirement": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "case_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
+        },
+        "thread_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1
+        },
+        "request_source_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "answer_status": {
+          "enum": [
+            "unassessed",
+            "answered",
+            "partial",
+            "unanswered"
+          ]
+        },
+        "answer_summary": {
+          "type": "string"
+        },
+        "answer_source_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "implementation": {
+          "enum": [
+            "unknown",
+            "reported",
+            "verified"
+          ]
+        },
+        "implementation_source_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "id",
+        "case_id",
+        "thread_id",
+        "text",
+        "request_source_ids",
+        "answer_status",
+        "answer_summary",
+        "answer_source_ids",
+        "implementation",
+        "implementation_source_ids"
+      ],
+      "additionalProperties": false
+    },
+    "thread_link": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "from_thread_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "to_thread_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "relation": {
+          "enum": [
+            "forwarded_to",
+            "follow_up",
+            "related_other_applicant",
+            "possible_relation"
+          ]
+        },
+        "source_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "notes": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "from_thread_id",
+        "to_thread_id",
+        "relation",
+        "source_ids",
+        "notes"
+      ],
+      "additionalProperties": false
+    },
+    "intake_entry": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "document_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "status": {
+          "enum": [
+            "pending",
+            "saved",
+            "partial",
+            "duplicate",
+            "needs_link",
+            "unreadable"
+          ]
+        },
+        "notes": {
+          "type": "string"
+        },
+        "saved_revision": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1
+        }
+      },
+      "required": [
+        "id",
+        "source_id",
+        "document_ids",
+        "status",
+        "notes",
+        "saved_revision"
+      ],
+      "additionalProperties": false
     }
   },
   "allOf": [
@@ -882,7 +1323,10 @@
       "if": {
         "properties": {
           "schema_version": {
-            "const": "0.5"
+            "enum": [
+              "0.5",
+              "0.6"
+            ]
           }
         }
       },
@@ -936,6 +1380,47 @@
                 ]
               }
             }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "schema_version": {
+            "const": "0.6"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "documents",
+          "evidence_records",
+          "attachments",
+          "requirements",
+          "thread_links",
+          "intake"
+        ]
+      },
+      "else": {
+        "properties": {
+          "documents": {
+            "maxItems": 0
+          },
+          "evidence_records": {
+            "maxItems": 0
+          },
+          "attachments": {
+            "maxItems": 0
+          },
+          "requirements": {
+            "maxItems": 0
+          },
+          "thread_links": {
+            "maxItems": 0
+          },
+          "intake": {
+            "maxItems": 0
           }
         }
       }
