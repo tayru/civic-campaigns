@@ -91,3 +91,10 @@ https://www.betterevaluation.org/methods-approaches/approaches/contribution-anal
 - Advocacy Campaign Builder: https://www.skillsdirectory.com/skills/eli-yu-first-advocacy-campaign-builder — просмотрен текст карточки и SKILL.md в каталоге; описание и запуск без подробной методики. Исходный репозиторий и исполнение не проверены. Рейтинг каталога не означает качество рекомендаций.
 
 Эти находки не являются зависимостями пакета и не требуют установки. Предпочитай содержательные методики и собственные проверяемые сценарии.
+
+## Приёмы, адаптированные из других скиллов
+
+- [Mapping Legal Cases](https://github.com/chen-friedman/legal-skills/blob/main/skills/mapping-legal-cases/SKILL.md) — опись файлов и видимый результат разбора.
+- [Case Manager](https://raw.githubusercontent.com/ahang1598/doubao-workbuddy-qwenwork-skills/main/qwenwork/experts/Legal-Department/skills/lawd-case-manager/SKILL.md#L150) и [Deadline and Reply Tracking](https://github.com/jamditis/claude-skills-journalism/blob/master/newsroom-agent-ops/skills/deadline-and-reply-tracking/SKILL.md) — сводка исключений и сверка дат по источникам.
+- [FOIA Requests](https://raw.githubusercontent.com/jamditis/claude-skills-journalism/master/journalism-core/skills/foia-requests/SKILL.md#L521) и [Ex-USSR Kinship Research](https://github.com/DenisSergeevitch/ex-ussr-kinship-research/blob/main/references/correspondence.md) — сверка документов по нескольким ответам и карточка канала подачи.
+- [Grassroots Mobilization](https://nonprofit-skills.ai/skills/advocacy-policy/nonprofit-grassroots-mobilization/#petition-campaign-design) и [Coalition Building](https://nonprofit-skills.ai/skills/advocacy-policy/nonprofit-coalition-building/#message-alignment-process) — контроль передачи петиции и согласования совместного письма.
